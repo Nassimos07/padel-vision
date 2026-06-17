@@ -72,8 +72,8 @@ def _render(bg, grid, quad, Hc, nx, ny, power, alpha) -> np.ndarray:
 
 def make_heatmap(
     video, start: float = 0.0, duration: float | None = None, stride: int = 3,
-    conf: float = 0.5, nx: int = 12, ny: int = 8, power: float = 0.6, alpha: float = 0.62,
-    output=None, show: bool = True,
+    conf: float = 0.5, model: str = "medium", nx: int = 12, ny: int = 8,
+    power: float = 0.6, alpha: float = 0.62, output=None, show: bool = True,
 ) -> str:
     """Render the zonal court heatmap for a clip and save it (optionally show it)."""
     quad = calibration.court(video)
@@ -91,6 +91,7 @@ def make_heatmap(
 
     cfg = Config().detector
     cfg.confidence = conf
+    cfg.model = model
     detector = build_detector(cfg)
 
     grid = np.zeros((ny, nx), np.float32)

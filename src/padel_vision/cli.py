@@ -61,15 +61,18 @@ class _Court:
 class _Detect:
     """Detection commands."""
 
-    def players(self, video: str, frame: int = 0, conf: float = 0.5):
+    def players(self, video: str, frame: int = 0, conf: float = 0.5,
+                model: str = "medium", stride: int = 2):
         """Detect players in real time, filtered by the saved ROI if there is one.
 
         Args:
             video: path to a padel clip.
             frame: frame index to start from (default ``0``).
             conf: detection confidence threshold (default ``0.5``).
+            model: RF-DETR size — nano|small|medium|base|large (smaller = faster).
+            stride: detect every Nth frame, reusing the result in between (smoother stream).
         """
-        detect_players(video, frame=frame, conf=conf)
+        detect_players(video, frame=frame, conf=conf, model=model, stride=stride)
 
 
 class PadelVision:
@@ -81,7 +84,8 @@ class PadelVision:
         self.detect = _Detect()
 
     def heatmap(self, video: str, start: float = 0.0, duration: float = None,
-                stride: int = 3, conf: float = 0.5, output: str = None, show: bool = True):
+                stride: int = 3, conf: float = 0.5, model: str = "medium",
+                output: str = None, show: bool = True):
         """Render the zonal court heatmap for a clip (run `court adjust` first).
 
         Args:
@@ -90,11 +94,12 @@ class PadelVision:
             duration: seconds to accumulate (default: the whole clip).
             stride: process every Nth frame (default 3; higher = faster).
             conf: detection confidence threshold (default 0.5).
+            model: RF-DETR size — nano|small|medium|base|large (smaller = faster).
             output: image path (default data/processed/<clip>_heatmap.jpg).
             show: also display the result in a window (default True).
         """
         make_heatmap(video, start=start, duration=duration, stride=stride,
-                     conf=conf, output=output, show=show)
+                     conf=conf, model=model, output=output, show=show)
 
     def version(self):
         """Print the installed version."""
