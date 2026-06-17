@@ -21,6 +21,7 @@ from padel_vision.detect import detect_players
 from padel_vision.heatmap import make_heatmap
 from padel_vision.pickers import pick_points
 from padel_vision.rings import adjust_ring
+from padel_vision.track import track_players
 from padel_vision.video.io import grab_frame
 
 
@@ -89,6 +90,56 @@ class _Detect:
         detect_players(video, frame=frame, conf=conf, model=model, stride=stride)
 
 
+class _Track:
+    """Tracking commands."""
+
+    def players(
+        self,
+        video: str,
+        frame: int = 0,
+        conf: float = 0.5,
+        model: str = "medium",
+        stride: int = 1,
+        smoothing: float = 0.35,
+        hold_frames: int = 30,
+        foreground: bool = True,
+        foreground_model: str = "yolo11n-seg.pt",
+        foreground_stride: int = 1,
+        trail: bool = False,
+        labels: bool = False,
+    ):
+        """Track players live with the full AR overlay from the v1 notebook.
+
+        Args:
+            video: path to a padel clip.
+            frame: frame index to start from (default ``0``).
+            conf: detection confidence threshold (default ``0.5``).
+            model: RF-DETR size — nano|small|medium|base|large (smaller = faster).
+            stride: run detection/tracking every Nth frame and coast between.
+            smoothing: EMA weight for box smoothing (lower = steadier, more lag).
+            hold_frames: frames to keep a lost track alive.
+            foreground: segment and paste players in front of the AR graphics.
+            foreground_model: Ultralytics segmentation weights for foreground matting.
+            foreground_stride: refresh the foreground matte every Nth frame.
+            trail: show a short movement trail behind each tracked player.
+            labels: show P<ID> labels under players.
+        """
+        track_players(
+            video,
+            frame=frame,
+            conf=conf,
+            model=model,
+            stride=stride,
+            smoothing=smoothing,
+            hold_frames=hold_frames,
+            foreground=foreground,
+            foreground_model=foreground_model,
+            foreground_stride=foreground_stride,
+            trail=trail,
+            labels=labels,
+        )
+
+
 class PadelVision:
     """padel-vision — computer-vision analytics for padel."""
 
@@ -96,24 +147,34 @@ class PadelVision:
         self.roi = _Roi()
         self.court = _Court()
         self.detect = _Detect()
+        self.track = _Track()
 
     def heatmap(self, video: str, start: float = 0.0, duration: float = None,
                 stride: int = 3, conf: float = 0.5, model: str = "medium",
-                output: str = None, show: bool = True):
-        """Render the zonal court heatmap for a clip (run `court adjust` first).
+                output: str = None, show: bool = True, frame: int = None,
+                foreground: bool = True, foreground_model: str = "yolo11n-seg.pt",
+                trail: bool = False, labels: bool = False):
+        """Render one heatmap preview frame with segmentation + detections.
 
         Args:
             video: path to a padel clip.
-            start: seconds to start from (default 0).
-            duration: seconds to accumulate (default: the whole clip).
-            stride: process every Nth frame (default 3; higher = faster).
+            start: seconds to pick the preview frame from (default 0).
+            duration: accepted for compatibility; ignored in single-frame preview mode.
+            stride: accepted for compatibility; ignored in single-frame preview mode.
             conf: detection confidence threshold (default 0.5).
             model: RF-DETR size — nano|small|medium|base|large (smaller = faster).
             output: image path (default data/processed/<clip>_heatmap.jpg).
             show: also display the result in a window (default True).
+            frame: exact frame index to preview; overrides ``start`` when set.
+            foreground: segment and paste players in front of the heatmap.
+            foreground_model: Ultralytics segmentation weights for foreground matting.
+            trail: show the same movement trail annotation used by ``track players``.
+            labels: show the same P<ID> labels used by ``track players``.
         """
         make_heatmap(video, start=start, duration=duration, stride=stride,
-                     conf=conf, model=model, output=output, show=show)
+                     conf=conf, model=model, output=output, show=show,
+                     frame=frame, foreground=foreground, foreground_model=foreground_model,
+                     trail=trail, labels=labels)
 
     def version(self):
         """Print the installed version."""
