@@ -1,0 +1,47 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Model weights
+*.pt
+*.onnx
+*.engine
+models/*
+!models/.gitkeep
+
+# Data & outputs (keep folders, ignore contents)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Demo assets are kept on purpose
+!docs/*.gif
+!docs/*.png

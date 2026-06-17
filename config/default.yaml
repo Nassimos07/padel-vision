@@ -1,0 +1,17 @@
+# Default configuration for the padel analytics pipeline.
+# Override any field on the CLI (e.g. --conf 0.4) or by passing your own YAML.
+
+detector:
+  model_path: yolo11m.pt   # yolo11n/s/m/l/x.pt — n is fastest, x is most accurate
+  confidence: 0.30         # minimum detection confidence
+  iou: 0.50                # NMS IoU threshold
+  imgsz: 640               # inference image size
+  device: null             # null => auto (cuda if available, else cpu)
+  classes: [0, 32]         # COCO ids kept: 0 = person (players), 32 = sports ball
+
+video:
+  stride: 1                # process every Nth frame (1 = every frame)
+
+annotation:
+  show_labels: true
+  show_confidence: true
