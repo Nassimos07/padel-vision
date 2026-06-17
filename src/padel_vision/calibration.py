@@ -59,6 +59,13 @@ def save_court(video: str | Path, corners, base: str | Path = DEFAULT_DIR) -> Pa
     return _save(video, data, base)
 
 
+def save_ring(video: str | Path, params: dict, base: str | Path = DEFAULT_DIR) -> Path:
+    """Save the AR ground-ring style params (radius, tilt, persp, ...)."""
+    data = load(video, base)
+    data["ring"] = dict(params)
+    return _save(video, data, base)
+
+
 def roi(video: str | Path, base: str | Path = DEFAULT_DIR) -> np.ndarray | None:
     """The ROI polygon as an ``(N, 2)`` int32 array, or ``None`` if unset."""
     pts = load(video, base).get("roi")
@@ -69,3 +76,8 @@ def court(video: str | Path, base: str | Path = DEFAULT_DIR) -> np.ndarray | Non
     """The court corners as a ``(4, 2)`` float32 array (TL, TR, BR, BL), or ``None``."""
     c = load(video, base).get("court")
     return np.float32([c[n] for n in CORNER_NAMES]) if c else None
+
+
+def ring(video: str | Path, base: str | Path = DEFAULT_DIR) -> dict | None:
+    """The saved AR ground-ring style params, or ``None`` if unset."""
+    return load(video, base).get("ring")

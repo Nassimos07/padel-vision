@@ -20,6 +20,7 @@ from padel_vision.court import CORNER_NAMES
 from padel_vision.detect import detect_players
 from padel_vision.heatmap import make_heatmap
 from padel_vision.pickers import pick_points
+from padel_vision.rings import adjust_ring
 from padel_vision.video.io import grab_frame
 
 
@@ -56,6 +57,19 @@ class _Court:
             print("cancelled — nothing saved")
             return
         print(f"saved court corners -> {calibration.save_court(video, pts)}")
+
+    def ring(self, video: str, frame: int = 300, model: str = "medium"):
+        """Tune the AR ground-ring look (radius, tilt, perspective, glow, ...) and save it.
+
+        Opens an interactive window with sliders (like the notebook's "Dial it in" cell),
+        previewed on the players in the frame; press 's' to save, 'q' to cancel.
+
+        Args:
+            video: path to a padel clip.
+            frame: frame index to preview on (default 300).
+            model: RF-DETR size used for the preview detection (default medium).
+        """
+        adjust_ring(video, frame=frame, model=model)
 
 
 class _Detect:
