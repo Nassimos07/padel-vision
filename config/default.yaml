@@ -3,7 +3,7 @@
 
 detector:
   backend: rfdetr          # "rfdetr" (Roboflow, players) or "yolo" (Ultralytics)
-  model: medium            # rfdetr: nano|small|medium|large  ·  yolo: yolo11{n,s,m,l}.pt
+  model: medium            # rfdetr: nano|small|medium|base|large  ·  yolo: yolo11{n,s,m,l}.pt
   confidence: 0.50         # minimum detection confidence
   iou: 0.50                # YOLO NMS threshold (ignored by RF-DETR)
   imgsz: 640               # YOLO inference size (ignored by RF-DETR)

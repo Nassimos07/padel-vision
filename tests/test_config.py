@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from textwrap import dedent
 
-from padel_analytics import __version__
-from padel_analytics.config import Config
+from padel_ml import __version__
+from padel_ml.config import Config
 
 
 def test_version():
@@ -40,7 +40,7 @@ def test_config_from_yaml(tmp_path):
 
 
 def test_canonical_classes():
-    from padel_analytics.detection.classes import (
+    from padel_ml.detection.classes import (
         BALL,
         PLAYER,
         RFDETR_TO_CANONICAL,
@@ -52,9 +52,12 @@ def test_canonical_classes():
     assert RFDETR_TO_CANONICAL[1] == PLAYER  # COCO-91 person
 
 
-def test_detection_stats():
-    from padel_analytics.pipeline import DetectionStats
+def test_court_corner_roundtrip(tmp_path):
+    from padel_ml.court import CORNER_NAMES, load_corners, save_corners
 
-    stats = DetectionStats(frames=10, total_players=38, ball_frames=6)
-    assert stats.avg_players_per_frame == 3.8
-    assert stats.ball_visible_pct == 60.0
+    corners = [(715, 240), (1250, 240), (1530, 1070), (455, 1065)]
+    path = save_corners(corners, tmp_path / "court_corners.txt")
+    loaded = load_corners(path)
+    assert list(CORNER_NAMES) == ["TL", "TR", "BR", "BL"]
+    assert loaded.shape == (4, 2)
+    assert loaded.tolist() == [list(map(float, c)) for c in corners]

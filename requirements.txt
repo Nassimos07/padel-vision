@@ -3,23 +3,21 @@
 #   CUDA 12.1:  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 #   CPU only :  pip install torch torchvision
 # Then:  pip install -r requirements.txt
-# (or the editable install:  pip install -e ".[app,notebook,dev]")
+# (or the editable install:  pip install -e ".[notebook,dev]")
 # ---------------------------------------------------------------------------
 
-# Core
+# Core (the padel-ml package)
 rfdetr>=1.0
 ultralytics>=8.3.0
 supervision>=0.25.0
 opencv-python>=4.9.0
 numpy>=1.26
 pyyaml>=6.0
-pandas>=2.1
 tqdm>=4.66
+fire>=0.6
 
-# App
-streamlit>=1.36
-plotly>=5.22
-
-# Notebook
+# Notebook tutorials
+jupyter>=1.0
+ipywidgets>=8.1
 matplotlib>=3.8
-seaborn>=0.13
+pandas>=2.1

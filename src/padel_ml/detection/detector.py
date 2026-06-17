@@ -17,7 +17,7 @@ import supervision as sv
 from ..config import DetectorConfig
 from .classes import (
     BALL,
-    PLAYER,
+    RFDETR_TO_CANONICAL,
     YOLO_TO_CANONICAL,
     remap_to_canonical,
 )
@@ -44,14 +44,22 @@ class RFDETRDetector(ObjectDetector):
 
     def __init__(self, config: DetectorConfig | None = None) -> None:
         import rfdetr
+        import torch
 
         self.config = config or DetectorConfig(backend="rfdetr")
+        # RF-DETR defaults to "cuda"; resolve our auto semantics (None => cuda if
+        # available, else cpu) so CPU-only machines don't fail on the default.
+        self.device = self.config.device or ("cuda" if torch.cuda.is_available() else "cpu")
         model_cls = self._resolve_model_class(rfdetr, self.config.model)
-        self.model = model_cls()
+        self.model = model_cls(device=self.device)
 
-        self.mapping = {1: PLAYER}
-        if self.config.detect_ball:
-            self.mapping[37] = BALL
+        # Reuse the single source of truth for RF-DETR's COCO ids; drop the ball
+        # class unless explicitly requested (mirrors how YOLODetector filters).
+        self.mapping = {
+            coco_id: canonical
+            for coco_id, canonical in RFDETR_TO_CANONICAL.items()
+            if canonical != BALL or self.config.detect_ball
+        }
 
     @classmethod
     def _resolve_model_class(cls, rfdetr_module, name: str):

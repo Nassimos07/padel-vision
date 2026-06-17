@@ -1,0 +1,5 @@
+# Court corners (image pixels) for 02_ar_showcase.ipynb — order: TL, TR, BR, BL
+TL 715 240
+TR 1250 240
+BR 1530 1070
+BL 455 1065
