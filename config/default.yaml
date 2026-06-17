@@ -1,5 +1,5 @@
-# Default configuration for the padel analytics pipeline.
-# Override any field on the CLI (e.g. --conf 0.4) or by passing your own YAML.
+# Default detector configuration for padel-vision.
+# Load it with padel_vision.config.Config.from_yaml(path).
 
 detector:
   backend: rfdetr          # "rfdetr" (Roboflow, players) or "yolo" (Ultralytics)
@@ -9,9 +9,6 @@ detector:
   imgsz: 640               # YOLO inference size (ignored by RF-DETR)
   device: null             # null => auto (cuda if available, else cpu)
   detect_ball: false       # ball is tiny/fast — deferred to a dedicated later stage
-
-video:
-  stride: 1                # process every Nth frame (1 = every frame)
 
 annotation:
   show_labels: true

@@ -2,7 +2,7 @@
 
 A thin, swappable interface sits in front of each concrete model so we can mix
 and match backends (RF-DETR for players now, a custom ball model later) without
-touching the rest of the pipeline. Every detector returns ``sv.Detections`` in
+touching the rest of the package. Every detector returns ``sv.Detections`` in
 the canonical class space (see ``classes.py``).
 """
 

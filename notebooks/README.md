@@ -6,7 +6,7 @@ is iterated as `_v1`, `_v2`, … so the history of each tutorial is preserved.
 
 ## `tutorials/`
 
-- **`padel_ar_showcase_v1.ipynb`** — ⭐ the flagship: raw clip → RF-DETR detection →
+- **`padel_vision_v1.ipynb`** — ⭐ the flagship: raw clip → RF-DETR detection →
   court-region filter → ByteTrack identities (+ EMA stabilizer) → perspective AR ground
   rings → court homography (corner picker) → FIFA-style zonal heatmap → segmentation
   matte (players in front) → full-clip "final cut" with timed transitions.

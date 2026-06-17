@@ -26,6 +26,7 @@ from supervision.annotators.utils import ColorLookup
 from tqdm import tqdm
 
 from padel_vision.config import Config
+from padel_vision.court import load_corners
 from padel_vision.detection.detector import build_detector
 from padel_vision.video.io import to_h264
 
@@ -44,9 +45,15 @@ START_SEC, DURATION_SEC = 4.0, 6.0          # which slice of the match to render
 SMOOTHING = 0.35     # EMA weight on the new measurement (lower = smoother, more lag)
 HOLD_FRAMES = 30     # keep drawing a lost track this many frames using its last box
 
-# Court region (image pixels) — detections whose feet fall outside are dropped
-COURT = np.array([(640, 215), (1270, 215), (1480, 470),
-                  (1520, 1060), (380, 1060), (430, 470)], dtype=np.int32)
+# Court region (image pixels) — detections whose feet fall outside are dropped.
+# Reuse the saved corners from `padel-vision court adjust` if present, else a default.
+_CORNERS = ROOT / "notebooks" / "tutorials" / "court_corners.txt"
+COURT = (
+    load_corners(_CORNERS).astype(np.int32)
+    if _CORNERS.exists()
+    else np.array([(640, 215), (1270, 215), (1480, 470),
+                   (1520, 1060), (380, 1060), (430, 470)], dtype=np.int32)
+)
 
 # AR ground-ring look (matches the notebook's tuned defaults)
 RING = dict(radius=70, tilt=68.0, rot_y=0.0, rot_z=0.0, persp=420.0, depth=0.45,

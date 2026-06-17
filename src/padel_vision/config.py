@@ -1,4 +1,4 @@
-"""Typed, YAML-backed configuration for the pipeline."""
+"""Typed, YAML-backed detector configuration for padel-vision."""
 
 from __future__ import annotations
 
@@ -22,11 +22,6 @@ class DetectorConfig:
 
 
 @dataclass
-class VideoConfig:
-    stride: int = 1  # process every Nth frame
-
-
-@dataclass
 class AnnotationConfig:
     show_labels: bool = True
     show_confidence: bool = True
@@ -35,7 +30,6 @@ class AnnotationConfig:
 @dataclass
 class Config:
     detector: DetectorConfig = field(default_factory=DetectorConfig)
-    video: VideoConfig = field(default_factory=VideoConfig)
     annotation: AnnotationConfig = field(default_factory=AnnotationConfig)
 
     @classmethod
@@ -44,6 +38,5 @@ class Config:
         data = yaml.safe_load(Path(path).read_text()) or {}
         return cls(
             detector=DetectorConfig(**(data.get("detector") or {})),
-            video=VideoConfig(**(data.get("video") or {})),
             annotation=AnnotationConfig(**(data.get("annotation") or {})),
         )

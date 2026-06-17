@@ -3,7 +3,7 @@
 Detectors disagree on COCO indexing: Ultralytics YOLO uses the 80-class,
 0-indexed space (``person=0``, ``sports ball=32``), while RF-DETR uses the
 original COCO 91-category space (``person=1``, ``sports ball=37``). We normalize
-everything into a tiny canonical set so the rest of the pipeline never has to
+everything into a tiny canonical set so the rest of the package never has to
 care which model produced a detection.
 """
 

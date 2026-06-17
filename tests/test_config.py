@@ -17,7 +17,7 @@ def test_default_config():
     assert cfg.detector.backend == "rfdetr"
     assert cfg.detector.model == "medium"
     assert 0.0 < cfg.detector.confidence < 1.0
-    assert cfg.video.stride >= 1
+    assert cfg.annotation.show_labels is True
 
 
 def test_config_from_yaml(tmp_path):
@@ -27,14 +27,14 @@ def test_config_from_yaml(tmp_path):
               backend: yolo
               model: yolo11s.pt
               confidence: 0.4
-            video:
-              stride: 2
+            annotation:
+              show_confidence: false
             """))
     cfg = Config.from_yaml(path)
     assert cfg.detector.backend == "yolo"
     assert cfg.detector.model == "yolo11s.pt"
     assert cfg.detector.confidence == 0.4
-    assert cfg.video.stride == 2
+    assert cfg.annotation.show_confidence is False
     # Untouched fields keep their defaults.
     assert cfg.detector.iou == 0.50
 
