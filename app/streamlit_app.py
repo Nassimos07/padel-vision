@@ -17,17 +17,22 @@ from padel_analytics.video.io import to_h264
 st.set_page_config(page_title="Padel Match Analytics", page_icon="🎾", layout="wide")
 
 st.title("🎾 Padel Match Analytics")
-st.caption("Stage 1 — Object detection of players & ball with YOLOv11")
+st.caption("Stage 1 — Object detection of players & ball (RF-DETR / YOLOv11)")
 
 with st.sidebar:
     st.header("⚙️ Settings")
-    model = st.selectbox(
-        "Model", ["yolo11n.pt", "yolo11s.pt", "yolo11m.pt", "yolo11l.pt"], index=2
-    )
-    conf = st.slider("Confidence", 0.05, 0.90, 0.30, 0.05)
+    backend = st.radio("Detector", ["RF-DETR", "YOLO"], horizontal=True)
+    if backend == "RF-DETR":
+        backend_key = "rfdetr"
+        model = st.selectbox("RF-DETR model", ["nano", "small", "medium", "large"], index=2)
+    else:
+        backend_key = "yolo"
+        model = st.selectbox("YOLO model", ["yolo11n.pt", "yolo11s.pt", "yolo11m.pt"], index=2)
+    conf = st.slider("Confidence", 0.05, 0.90, 0.50, 0.05)
     stride = st.slider("Frame stride (higher = faster)", 1, 5, 1)
+    detect_ball = st.checkbox("Detect ball (experimental)", value=False)
     st.markdown("---")
-    st.caption("Built with Ultralytics YOLO + Roboflow Supervision")
+    st.caption("Built with RF-DETR (Roboflow) + Supervision")
 
 uploaded = st.file_uploader("Upload a short padel clip", type=["mp4", "mov", "avi"])
 
@@ -46,8 +51,10 @@ with tempfile.TemporaryDirectory() as tmp:
     out = Path(tmp) / "detected.mp4"
 
     config = Config()
-    config.detector.model_path = model
+    config.detector.backend = backend_key
+    config.detector.model = model
     config.detector.confidence = conf
+    config.detector.detect_ball = detect_ball
     config.video.stride = stride
 
     with st.spinner("Detecting players & ball… (first run downloads the model)"):

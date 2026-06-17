@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Built with Ultralytics](https://img.shields.io/badge/built%20with-Ultralytics%20YOLO-0b5394.svg)](https://github.com/ultralytics/ultralytics)
+[![RF-DETR](https://img.shields.io/badge/detector-RF--DETR-0b5394.svg)](https://github.com/roboflow/rf-detr)
 [![Supervision](https://img.shields.io/badge/annotations-Supervision-7a3ff2.svg)](https://github.com/roboflow/supervision)
 
 <!-- Add your demo GIF here once Stage 1 runs: docs/demo.gif -->
@@ -22,15 +22,16 @@
 A step-by-step computer-vision pipeline that turns a raw padel match video into rich analytics.
 We build it **feature by feature** — each stage is a self-contained, reviewable module.
 
-> **Stage 1 (current): object detection** of players and the ball with YOLOv11.
+> **Stage 1 (current): object detection** of the players with RF-DETR. _(Ball detection is
+> deferred — a tiny, fast object that needs a dedicated model; see the roadmap.)_
 
 ## ✨ Features & Roadmap
 
-- [x] **Stage 1 — Object detection** · players + ball, annotated overlay video _(YOLOv11)_
+- [x] **Stage 1 — Object detection** · players, annotated overlay video _(RF-DETR)_
 - [ ] **Stage 2 — Multi-object tracking** · persistent player IDs + ball trajectory _(ByteTrack)_
 - [ ] **Stage 3 — Court detection & homography** · top-down minimap
 - [ ] **Stage 4 — Player movement** · heatmaps + distance covered
-- [ ] **Stage 5 — Ball analytics** · trajectory + speed estimation
+- [ ] **Stage 5 — Ball detection & analytics** · dedicated ball model + trajectory/speed
 - [ ] **Stage 6 — Shot/event detection** · bandeja, víbora, smash, volley
 - [ ] **Stage 7 — Match stats dashboard** · the full interactive story
 - [ ] **Stage 8 — (optional) outcome model** · the MLOps cherry on top
@@ -39,7 +40,7 @@ We build it **feature by feature** — each stage is a self-contained, reviewabl
 
 | Area | Tools |
 |------|-------|
-| Detection | [Ultralytics YOLOv11](https://github.com/ultralytics/ultralytics) (RF-DETR-ready interface) |
+| Detection | [RF-DETR](https://github.com/roboflow/rf-detr) (players) · [Ultralytics YOLOv11](https://github.com/ultralytics/ultralytics) (swappable backend) |
 | CV utilities | [Supervision](https://github.com/roboflow/supervision), OpenCV, ffmpeg |
 | Analytics | NumPy, pandas |
 | Visualization | Plotly, Streamlit, Matplotlib/Seaborn |
@@ -90,8 +91,11 @@ streamlit run app/streamlit_app.py
 # Basic
 padel detect data/raw/match.mp4
 
-# Pick a model + confidence, custom output path
-padel detect data/raw/match.mp4 --model yolo11s.pt --conf 0.35 -o data/processed/out.mp4
+# Choose RF-DETR model size + confidence, custom output path
+padel detect data/raw/match.mp4 --model small --conf 0.4 -o data/processed/out.mp4
+
+# Swap the detector backend to YOLO
+padel detect data/raw/match.mp4 --backend yolo --model yolo11m.pt
 
 # Use a config file
 padel detect data/raw/match.mp4 -c config/default.yaml
@@ -99,8 +103,9 @@ padel detect data/raw/match.mp4 -c config/default.yaml
 
 ## 🤝 Acknowledgements
 
-Built on the excellent open-source work of [Ultralytics](https://github.com/ultralytics/ultralytics)
-and [Roboflow Supervision](https://github.com/roboflow/supervision).
+Built on the excellent open-source work of [Roboflow RF-DETR](https://github.com/roboflow/rf-detr),
+[Ultralytics](https://github.com/ultralytics/ultralytics) and
+[Roboflow Supervision](https://github.com/roboflow/supervision).
 
 ## 📄 License
 

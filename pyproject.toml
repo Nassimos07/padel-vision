@@ -17,6 +17,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Image Recognition",
 ]
 dependencies = [
+  "rfdetr>=1.0",
   "ultralytics>=8.3.0",
   "supervision>=0.25.0",
   "opencv-python>=4.9.0",

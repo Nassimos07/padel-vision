@@ -14,9 +14,7 @@ class DetectionAnnotator:
     def __init__(self, config: AnnotationConfig | None = None) -> None:
         self.config = config or AnnotationConfig()
         self.box_annotator = sv.RoundBoxAnnotator(thickness=2)
-        self.label_annotator = sv.LabelAnnotator(
-            text_scale=0.5, text_thickness=1, text_padding=4
-        )
+        self.label_annotator = sv.LabelAnnotator(text_scale=0.5, text_thickness=1, text_padding=4)
 
     def _labels(self, detections: sv.Detections) -> list[str]:
         names = detections.data.get("class_name", [])

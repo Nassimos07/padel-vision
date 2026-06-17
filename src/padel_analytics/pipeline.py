@@ -8,9 +8,10 @@ from pathlib import Path
 import supervision as sv
 from tqdm import tqdm
 
-from .config import BALL_CLASS_ID, PERSON_CLASS_ID, Config
+from .config import Config
 from .detection.annotate import DetectionAnnotator
-from .detection.detector import ObjectDetector, YOLODetector
+from .detection.classes import BALL, PLAYER
+from .detection.detector import ObjectDetector, build_detector
 
 
 @dataclass
@@ -46,7 +47,7 @@ def run_detection(
     Returns simple per-video statistics.
     """
     config = config or Config()
-    detector = detector or YOLODetector(config.detector)
+    detector = detector or build_detector(config.detector)
     annotator = DetectionAnnotator(config.annotation)
 
     info = sv.VideoInfo.from_video_path(str(source))
@@ -54,10 +55,18 @@ def run_detection(
     total = info.total_frames // stride if info.total_frames else None
     frames = sv.get_video_frames_generator(str(source), stride=stride)
 
+    # Sub-sampling frames means the output must slow its fps to stay real-time.
+    out_info = sv.VideoInfo(
+        width=info.width,
+        height=info.height,
+        fps=max(1, round(info.fps / stride)),
+        total_frames=total,
+    )
+
     Path(target).parent.mkdir(parents=True, exist_ok=True)
     stats = DetectionStats()
 
-    with sv.VideoSink(str(target), video_info=info) as sink:
+    with sv.VideoSink(str(target), video_info=out_info) as sink:
         for frame in tqdm(frames, total=total, desc="Detecting", disable=not progress):
             detections = detector.detect(frame)
             sink.write_frame(annotator.annotate(frame, detections))
@@ -65,8 +74,8 @@ def run_detection(
             stats.frames += 1
             class_id = detections.class_id
             if class_id is not None and len(class_id):
-                stats.total_players += int((class_id == PERSON_CLASS_ID).sum())
-                if bool((class_id == BALL_CLASS_ID).any()):
+                stats.total_players += int((class_id == PLAYER).sum())
+                if bool((class_id == BALL).any()):
                     stats.ball_frames += 1
 
     return stats

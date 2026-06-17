@@ -17,8 +17,9 @@ def _build_parser() -> argparse.ArgumentParser:
     detect.add_argument("source", type=str, help="Input video path")
     detect.add_argument("-o", "--output", type=str, default=None, help="Output video path")
     detect.add_argument("-c", "--config", type=str, default=None, help="YAML config path")
-    detect.add_argument("--model", type=str, default=None, help="Override model (e.g. yolo11s.pt)")
-    detect.add_argument("--conf", type=float, default=None, help="Override confidence threshold")
+    detect.add_argument("--backend", choices=["rfdetr", "yolo"], default=None, help="Detector")
+    detect.add_argument("--model", type=str, default=None, help="Model (e.g. base, yolo11m.pt)")
+    detect.add_argument("--conf", type=float, default=None, help="Confidence threshold")
     detect.add_argument("--stride", type=int, default=None, help="Process every Nth frame")
     return parser
 
@@ -28,8 +29,10 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "detect":
         config = Config.from_yaml(args.config) if args.config else Config()
+        if args.backend is not None:
+            config.detector.backend = args.backend
         if args.model is not None:
-            config.detector.model_path = args.model
+            config.detector.model = args.model
         if args.conf is not None:
             config.detector.confidence = args.conf
         if args.stride is not None:
@@ -42,11 +45,15 @@ def main(argv: list[str] | None = None) -> None:
             else Path("data/processed") / f"{source.stem}_detected.mp4"
         )
 
+        print(f"🎾 Detecting with {config.detector.backend}:{config.detector.model} ...")
         stats = run_detection(source, output, config)
         print(f"\n✅ Done → {output}")
         print(f"   frames processed  : {stats.frames}")
         print(f"   avg players/frame : {stats.avg_players_per_frame:.2f}")
-        print(f"   ball visible      : {stats.ball_frames} frames ({stats.ball_visible_pct:.1f}%)")
+        if config.detector.detect_ball:
+            print(
+                f"   ball visible      : {stats.ball_frames} frames ({stats.ball_visible_pct:.1f}%)"
+            )
 
 
 if __name__ == "__main__":

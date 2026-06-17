@@ -30,9 +30,18 @@ def to_h264(source: str | Path, target: str | Path | None = None) -> Path:
     target = Path(target) if target else source.with_name(f"{source.stem}_h264.mp4")
     subprocess.run(
         [
-            "ffmpeg", "-y", "-i", str(source),
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-            "-an", str(target),
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(source),
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-movflags",
+            "+faststart",
+            "-an",
+            str(target),
         ],
         check=True,
         stdout=subprocess.DEVNULL,

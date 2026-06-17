@@ -1,53 +1,104 @@
 """Object detectors.
 
-A thin, swappable interface sits in front of the concrete model so that we can
-move from YOLO to RF-DETR (or anything else) later without touching the rest of
-the pipeline.
+A thin, swappable interface sits in front of each concrete model so we can mix
+and match backends (RF-DETR for players now, a custom ball model later) without
+touching the rest of the pipeline. Every detector returns ``sv.Detections`` in
+the canonical class space (see ``classes.py``).
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+import cv2
 import numpy as np
 import supervision as sv
 
 from ..config import DetectorConfig
+from .classes import (
+    BALL,
+    PLAYER,
+    YOLO_TO_CANONICAL,
+    remap_to_canonical,
+)
 
 
 class ObjectDetector(ABC):
-    """Detect objects in a single BGR frame and return ``sv.Detections``."""
+    """Detect objects in a single BGR frame and return canonical ``sv.Detections``."""
 
     @abstractmethod
     def detect(self, frame: np.ndarray) -> sv.Detections:
         raise NotImplementedError
 
 
-class YOLODetector(ObjectDetector):
-    """Ultralytics YOLO (v11) detector, filtered to the configured classes."""
+class RFDETRDetector(ObjectDetector):
+    """RF-DETR (Roboflow) detector — COCO-pretrained, transformer-based, no NMS."""
+
+    _CLASS_TABLE = {
+        "nano": "RFDETRNano",
+        "small": "RFDETRSmall",
+        "medium": "RFDETRMedium",
+        "base": "RFDETRBase",
+        "large": "RFDETRLarge",
+    }
 
     def __init__(self, config: DetectorConfig | None = None) -> None:
-        # Imported lazily so the package can be imported without torch installed.
+        import rfdetr
+
+        self.config = config or DetectorConfig(backend="rfdetr")
+        model_cls = self._resolve_model_class(rfdetr, self.config.model)
+        self.model = model_cls()
+
+        self.mapping = {1: PLAYER}
+        if self.config.detect_ball:
+            self.mapping[37] = BALL
+
+    @classmethod
+    def _resolve_model_class(cls, rfdetr_module, name: str):
+        class_name = cls._CLASS_TABLE.get(name.lower(), "RFDETRBase")
+        if not hasattr(rfdetr_module, class_name):  # older versions only ship Base/Large
+            class_name = "RFDETRBase"
+        return getattr(rfdetr_module, class_name)
+
+    def detect(self, frame: np.ndarray) -> sv.Detections:
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        detections = self.model.predict(rgb, threshold=self.config.confidence)
+        return remap_to_canonical(detections, self.mapping)
+
+
+class YOLODetector(ObjectDetector):
+    """Ultralytics YOLO (v11) detector — kept as a fast, swappable alternative."""
+
+    def __init__(self, config: DetectorConfig | None = None) -> None:
         import torch
         from ultralytics import YOLO
 
-        self.config = config or DetectorConfig()
+        self.config = config or DetectorConfig(backend="yolo", model="yolo11m.pt")
         self.device = self.config.device or ("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = YOLO(self.config.model_path)
+        self.model = YOLO(self.config.model)
         self.model.to(self.device)
 
-    @property
-    def class_names(self) -> dict[int, str]:
-        return self.model.names
+        self._classes = [0] + ([32] if self.config.detect_ball else [])
 
     def detect(self, frame: np.ndarray) -> sv.Detections:
         result = self.model.predict(
             frame,
             conf=self.config.confidence,
             iou=self.config.iou,
-            classes=self.config.classes,
+            classes=self._classes,
             imgsz=self.config.imgsz,
             device=self.device,
             verbose=False,
         )[0]
-        return sv.Detections.from_ultralytics(result)
+        detections = sv.Detections.from_ultralytics(result)
+        return remap_to_canonical(detections, YOLO_TO_CANONICAL)
+
+
+def build_detector(config: DetectorConfig) -> ObjectDetector:
+    """Instantiate the detector backend named in the config."""
+    backend = config.backend.lower()
+    if backend == "rfdetr":
+        return RFDETRDetector(config)
+    if backend == "yolo":
+        return YOLODetector(config)
+    raise ValueError(f"Unknown detector backend: {config.backend!r} (use 'rfdetr' or 'yolo')")
