@@ -18,6 +18,7 @@ import fire
 from padel_vision import __version__, calibration
 from padel_vision.court import CORNER_NAMES
 from padel_vision.detect import detect_players
+from padel_vision.heatmap import make_heatmap
 from padel_vision.pickers import pick_points
 from padel_vision.video.io import grab_frame
 
@@ -78,6 +79,22 @@ class PadelVision:
         self.roi = _Roi()
         self.court = _Court()
         self.detect = _Detect()
+
+    def heatmap(self, video: str, start: float = 0.0, duration: float = None,
+                stride: int = 3, conf: float = 0.5, output: str = None, show: bool = True):
+        """Render the zonal court heatmap for a clip (run `court adjust` first).
+
+        Args:
+            video: path to a padel clip.
+            start: seconds to start from (default 0).
+            duration: seconds to accumulate (default: the whole clip).
+            stride: process every Nth frame (default 3; higher = faster).
+            conf: detection confidence threshold (default 0.5).
+            output: image path (default data/processed/<clip>_heatmap.jpg).
+            show: also display the result in a window (default True).
+        """
+        make_heatmap(video, start=start, duration=duration, stride=stride,
+                     conf=conf, output=output, show=show)
 
     def version(self):
         """Print the installed version."""
