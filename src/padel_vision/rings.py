@@ -52,16 +52,17 @@ def ring_points(center, p: dict, frame_h: int, n: int = 160) -> np.ndarray:
 def draw_ring(img, pts, color, thickness: int = 2, glow: float = 0.55):
     """Thin, broadcast-clean double ring with a soft glow."""
     pi = pts.astype(np.int32)
-    t = int(thickness)
     if glow > 0:
         layer = np.zeros_like(img)
-        cv2.polylines(layer, [pi], True, color, t + 7, cv2.LINE_AA)
+        cv2.polylines(layer, [pi], True, color, thickness + 7, cv2.LINE_AA)
+        cv2.polylines(layer, [pi], True, color, 7, cv2.LINE_AA)     # dark base for contrast
+        cv2.polylines(layer, [pi], True, color, 2, cv2.LINE_AA)            # colour rim
+
         img = cv2.addWeighted(img, 1.0, cv2.GaussianBlur(layer, (0, 0), 7), glow, 0)
-    cv2.polylines(img, [pi], True, (0, 0, 0), t + 3, cv2.LINE_AA)
-    cv2.polylines(img, [pi], True, color, t, cv2.LINE_AA)
     inner = ((pts - pts.mean(0)) * 0.80 + pts.mean(0)).astype(np.int32)
-    cv2.polylines(img, [inner], True, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.polylines(img, [inner], True, (255, 255, 255), 1, cv2.LINE_AA)       # white inner highlight
     return img
+
 
 
 def ground_rings(img, dets: sv.Detections, params: dict, frame_h: int):
