@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "padel-ml"
+name = "padel-vision"
 version = "0.2.0"
 description = "Computer-vision analytics for padel matches: detection, tracking, court geometry and broadcast-style AR overlays."
 readme = "README.md"
@@ -32,11 +32,11 @@ notebook = ["jupyter>=1.0", "ipywidgets>=8.1", "matplotlib>=3.8", "pandas>=2.1"]
 dev = ["ruff>=0.6", "black>=24.0", "pytest>=8.0", "pre-commit>=3.7"]
 
 [project.scripts]
-padel-ml = "padel_ml.cli:main"
+padel-vision = "padel_vision.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/nassim/padel-ml"
-Repository = "https://github.com/nassim/padel-ml"
+Homepage = "https://github.com/nassim/padel-vision"
+Repository = "https://github.com/nassim/padel-vision"
 
 [tool.setuptools.packages.find]
 where = ["src"]

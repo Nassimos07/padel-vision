@@ -82,7 +82,7 @@ def adjust(
         if event == cv2.EVENT_LBUTTONDOWN and len(pts) < 4:
             pts.append((int(x), int(y)))
 
-    win = "padel-ml court adjust"
+    win = "padel-vision court adjust"
     cv2.namedWindow(win, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win, 1280, 720)
     cv2.setMouseCallback(win, on_mouse)

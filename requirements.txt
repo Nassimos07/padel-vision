@@ -6,7 +6,7 @@
 # (or the editable install:  pip install -e ".[notebook,dev]")
 # ---------------------------------------------------------------------------
 
-# Core (the padel-ml package)
+# Core (the padel-vision package)
 rfdetr>=1.0
 ultralytics>=8.3.0
 supervision>=0.25.0

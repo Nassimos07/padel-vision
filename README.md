@@ -4,7 +4,7 @@
 
 **Turn a raw padel clip into a broadcast-grade analytics film — AR player rings, live court heatmaps, and players composited into the scene, all in one notebook.**
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nassim/padel-ml/blob/main/notebooks/tutorials/02_ar_showcase_v1.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nassim/padel-vision/blob/main/notebooks/tutorials/padel_ar_showcase_v1.ipynb)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![RF-DETR](https://img.shields.io/badge/detector-RF--DETR-0b5394.svg)](https://github.com/roboflow/rf-detr)
 [![ByteTrack](https://img.shields.io/badge/tracking-ByteTrack-1b9e4c.svg)](https://github.com/ifzhang/ByteTrack)
@@ -24,7 +24,7 @@ overlay: every player wrapped in a perspective-correct **AR ground ring**, a liv
 of where they move, and the players themselves **composited in front** of the graphics so it looks
 painted into the scene.
 
-It's a **self-contained notebook** — open it on **[Google Colab](https://colab.research.google.com/github/nassim/padel-ml/blob/main/notebooks/tutorials/02_ar_showcase_v1.ipynb)**, upload your own clip, run top to bottom. No local setup required.
+It's a **self-contained notebook** — open it on **[Google Colab](https://colab.research.google.com/github/nassim/padel-vision/blob/main/notebooks/tutorials/padel_ar_showcase_v1.ipynb)**, upload your own clip, run top to bottom. No local setup required.
 
 <div align="center">
 <img src="docs/ar_rings.jpg" alt="AR ground rings" width="49%">
@@ -58,15 +58,15 @@ From one video, the notebook builds — step by step:
 ## 🧩 Two ways to use it
 
 - **📓 Tutorial notebooks** (`notebooks/tutorials/`) — self-contained, step-by-step walkthroughs that
-  build the whole effect. The flagship is `02_ar_showcase_v1.ipynb`; future iterations land as `_v2`, `_v3`.
-- **📦 `padel-ml` package + CLI** — an installable library (`pip install -e .`) with reusable pieces
+  build the whole effect. The flagship is `padel_ar_showcase_v1.ipynb`; future iterations land as `_v2`, `_v3`.
+- **📦 `padel-vision` package + CLI** — an installable library (`pip install -e .`) with reusable pieces
   (detection, court geometry, video I/O) behind a [Fire](https://github.com/google/python-fire) CLI.
 
 ## 🚀 Quickstart
 
 ### The notebook on Google Colab (easiest)
 
-1. **[Open the flagship notebook in Colab](https://colab.research.google.com/github/nassim/padel-ml/blob/main/notebooks/tutorials/02_ar_showcase_v1.ipynb)**.
+1. **[Open the flagship notebook in Colab](https://colab.research.google.com/github/nassim/padel-vision/blob/main/notebooks/tutorials/padel_ar_showcase_v1.ipynb)**.
 2. **Runtime → Change runtime type → GPU**.
 3. Run the **Setup** cell (installs deps), then upload your clip when prompted, and run top to bottom.
 
@@ -75,9 +75,9 @@ From one video, the notebook builds — step by step:
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121  # match your CUDA
-pip install -e ".[notebook]"      # the padel-ml package + notebook deps
+pip install -e ".[notebook]"      # the padel-vision package + notebook deps
 
-jupyter lab notebooks/tutorials/02_ar_showcase_v1.ipynb
+jupyter lab notebooks/tutorials/padel_ar_showcase_v1.ipynb
 ```
 
 Drop a clip in `data/raw/` (or let the notebook prompt you), set your court corners (see below), and
@@ -87,10 +87,10 @@ run the cells. Outputs land in `data/processed/`.
 
 ```bash
 # pick the 4 court corners on a frame and save them (interactive OpenCV window)
-padel-ml court adjust data/raw/match.mp4 --output notebooks/tutorials/court_corners.txt
+padel-vision court adjust data/raw/match.mp4 --output notebooks/tutorials/court_corners.txt
 ```
 
-> 💡 The court geometry is clip-specific — set it once with `padel-ml court adjust` (or the **Step 1
+> 💡 The court geometry is clip-specific — set it once with `padel-vision court adjust` (or the **Step 1
 > corner picker** inside the notebook) before rendering.
 
 ## 🛠️ How it works (a few highlights)
@@ -123,13 +123,13 @@ padel-ml court adjust data/raw/match.mp4 --output notebooks/tutorials/court_corn
 ## 📂 Project structure
 
 ```
-padel-ml/
+padel-vision/
 ├── notebooks/tutorials/
-│   ├── 02_ar_showcase_v1.ipynb   # ⭐ the flagship, self-contained tutorial
+│   ├── padel_ar_showcase_v1.ipynb   # ⭐ the flagship, self-contained tutorial
 │   ├── 01_object_detection.ipynb
 │   └── court_corners.txt         # saved court calibration
-├── src/padel_ml/                 # the installable package
-│   ├── cli.py                    # Fire CLI: `padel-ml ...`
+├── src/padel_vision/                 # the installable package
+│   ├── cli.py                    # Fire CLI: `padel-vision ...`
 │   ├── court/                    # court-corner picker (homography ROI)
 │   ├── detection/                # RF-DETR / YOLO detector + annotators
 │   ├── video/                    # video I/O helpers

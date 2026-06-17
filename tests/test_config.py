@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from textwrap import dedent
 
-from padel_ml import __version__
-from padel_ml.config import Config
+from padel_vision import __version__
+from padel_vision.config import Config
 
 
 def test_version():
@@ -40,7 +40,7 @@ def test_config_from_yaml(tmp_path):
 
 
 def test_canonical_classes():
-    from padel_ml.detection.classes import (
+    from padel_vision.detection.classes import (
         BALL,
         PLAYER,
         RFDETR_TO_CANONICAL,
@@ -53,7 +53,7 @@ def test_canonical_classes():
 
 
 def test_court_corner_roundtrip(tmp_path):
-    from padel_ml.court import CORNER_NAMES, load_corners, save_corners
+    from padel_vision.court import CORNER_NAMES, load_corners, save_corners
 
     corners = [(715, 240), (1250, 240), (1530, 1070), (455, 1065)]
     path = save_corners(corners, tmp_path / "court_corners.txt")

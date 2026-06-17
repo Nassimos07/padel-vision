@@ -1,9 +1,9 @@
-"""``padel-ml`` command-line interface, built with `Python Fire`_.
+"""``padel-vision`` command-line interface, built with `Python Fire`_.
 
 Examples::
 
-    padel-ml court adjust data/raw/match.mp4
-    padel-ml court adjust data/raw/match.mp4 --frame 500 --output court_corners.txt
+    padel-vision court adjust data/raw/match.mp4
+    padel-vision court adjust data/raw/match.mp4 --frame 500 --output court_corners.txt
 
 .. _Python Fire: https://github.com/google/python-fire
 """
@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import fire
 
-from padel_ml import __version__
-from padel_ml.court import adjust as _court_adjust
+from padel_vision import __version__
+from padel_vision.court import adjust as _court_adjust
 
 
 class _Court:
@@ -31,7 +31,7 @@ class _Court:
 
 
 class PadelML:
-    """padel-ml — computer-vision analytics for padel."""
+    """padel-vision — computer-vision analytics for padel."""
 
     def __init__(self):
         self.court = _Court()
@@ -42,7 +42,7 @@ class PadelML:
 
 
 def main():
-    fire.Fire(PadelML, name="padel-ml")
+    fire.Fire(PadelML, name="padel-vision")
 
 
 if __name__ == "__main__":

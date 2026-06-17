@@ -1,6 +1,6 @@
 """Render a stabilized AR-overlay reel from a padel clip.
 
-Standalone companion to notebooks/02_ar_showcase.ipynb. Same pipeline
+Standalone companion to notebooks/tutorials/padel_ar_showcase_v1.ipynb. Same pipeline
 (detect -> court filter -> track -> AR ground rings), plus two extras that make
 the overlay broadcast-smooth:
 
@@ -25,9 +25,9 @@ import supervision as sv
 from supervision.annotators.utils import ColorLookup
 from tqdm import tqdm
 
-from padel_ml.config import Config
-from padel_ml.detection.detector import build_detector
-from padel_ml.video.io import to_h264
+from padel_vision.config import Config
+from padel_vision.detection.detector import build_detector
+from padel_vision.video.io import to_h264
 
 warnings.filterwarnings("ignore")
 

@@ -3,7 +3,7 @@ PY ?= python3
 SOURCE ?= data/raw/match.mp4
 
 help:
-	@echo "padel-ml - make targets:"
+	@echo "padel-vision - make targets:"
 	@echo "  make venv         Create a .venv virtual environment"
 	@echo "  make install      Install GPU torch (CUDA 12.1) + the package + extras"
 	@echo "  make install-cpu  Install CPU-only torch + the package + extras"
@@ -26,7 +26,7 @@ install-cpu:
 	pip install -e ".[notebook,dev]"
 
 court:
-	padel-ml court adjust $(SOURCE)
+	padel-vision court adjust $(SOURCE)
 
 lint:
 	ruff check src tests scripts
