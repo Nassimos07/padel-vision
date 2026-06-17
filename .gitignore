@@ -21,8 +21,10 @@ models/*
 # Data & outputs (keep folders, ignore contents)
 data/raw/*
 data/processed/*
+data/calibration/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+!data/calibration/.gitkeep
 *.mp4
 *.mov
 *.avi

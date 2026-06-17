@@ -7,6 +7,7 @@ import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 
+import cv2
 import numpy as np
 import supervision as sv
 
@@ -17,6 +18,17 @@ def video_info(source: str | Path) -> sv.VideoInfo:
 
 def frame_generator(source: str | Path, stride: int = 1) -> Iterator[np.ndarray]:
     return sv.get_video_frames_generator(str(source), stride=stride)
+
+
+def grab_frame(source: str | Path, index: int = 0) -> np.ndarray:
+    """Random-access a single BGR frame by index."""
+    cap = cv2.VideoCapture(str(source))
+    cap.set(cv2.CAP_PROP_POS_FRAMES, int(index))
+    ok, frame = cap.read()
+    cap.release()
+    if not ok:
+        raise FileNotFoundError(f"could not read frame {index} from {source!r}")
+    return frame
 
 
 def to_h264(source: str | Path, target: str | Path | None = None) -> Path:

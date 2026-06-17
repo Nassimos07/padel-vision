@@ -1,4 +1,4 @@
-.PHONY: help venv install install-cpu court lint format test clean
+.PHONY: help venv install install-cpu roi court detect lint format test clean
 PY ?= python3
 SOURCE ?= data/raw/match.mp4
 
@@ -7,7 +7,9 @@ help:
 	@echo "  make venv         Create a .venv virtual environment"
 	@echo "  make install      Install GPU torch (CUDA 12.1) + the package + extras"
 	@echo "  make install-cpu  Install CPU-only torch + the package + extras"
-	@echo "  make court        Pick court corners (override with SOURCE=path/to/video.mp4)"
+	@echo "  make roi          Draw the detection ROI (override with SOURCE=path/to/video.mp4)"
+	@echo "  make court        Pick the 4 court corners (override with SOURCE=...)"
+	@echo "  make detect       Detect players in real time (override with SOURCE=...)"
 	@echo "  make lint         Lint with ruff"
 	@echo "  make format       Format with black + ruff"
 	@echo "  make test         Run the test suite"
@@ -25,8 +27,14 @@ install-cpu:
 	pip install torch torchvision
 	pip install -e ".[notebook,dev]"
 
+roi:
+	padel-vision roi adjust $(SOURCE)
+
 court:
 	padel-vision court adjust $(SOURCE)
+
+detect:
+	padel-vision detect players $(SOURCE)
 
 lint:
 	ruff check src tests scripts

@@ -85,13 +85,17 @@ run the cells. Outputs land in `data/processed/`.
 
 ### The CLI
 
+A small **calibrate → detect** workflow. Calibration is saved per clip under
+`data/calibration/<clip>.json` and auto-loaded by later commands:
+
 ```bash
-# pick the 4 court corners on a frame and save them (interactive OpenCV window)
-padel-vision court adjust data/raw/match.mp4 --output notebooks/tutorials/court_corners.txt
+padel-vision roi adjust     data/raw/match.mp4   # draw a polygon that filters detections
+padel-vision court adjust   data/raw/match.mp4   # pick the 4 court corners (heatmap homography)
+padel-vision detect players data/raw/match.mp4   # real-time detection, filtered by the saved ROI
 ```
 
-> 💡 The court geometry is clip-specific — set it once with `padel-vision court adjust` (or the **Step 1
-> corner picker** inside the notebook) before rendering.
+> 💡 The `adjust` commands open an interactive OpenCV window (need a desktop display / WSLg).
+> `detect players` loads the saved ROI automatically — with none, it detects on the whole frame.
 
 ## 🛠️ How it works (a few highlights)
 
