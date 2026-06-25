@@ -91,16 +91,30 @@ jupyter lab notebooks/tutorials/padel_vision_v1.ipynb
 The package also exposes a small CLI for reusable calibration and preview steps:
 
 ```bash
+padel-vision guide
 padel-vision roi adjust     data/raw/match.mp4
 padel-vision court adjust   data/raw/match.mp4
 padel-vision court ring     data/raw/match.mp4
 padel-vision detect players data/raw/match.mp4 --model nano --stride 4
 padel-vision track players  data/raw/match.mp4 --model nano --stride 4
 padel-vision heatmap        data/raw/match.mp4 --frame 300
+padel-vision final cache    data/raw/match.mp4 --model nano --stride 2
+padel-vision final render   data/raw/match.mp4
 ```
 
 Calibration is saved per clip under `data/calibration/<clip>.json` and reused by later commands.
 Interactive commands use OpenCV windows, so they require a desktop display such as WSLg/X11.
+
+For a step-by-step setup, run:
+
+```bash
+padel-vision guide data/raw/padel_clip.mp4
+```
+
+The guide walks through ROI picking, court-corner picking, bird's-eye-view point pairs,
+the heatmap grid rectangle on the 2D map, the V2 notebook detection cache, and the direct
+OpenCV final render. It detects existing calibration files and asks whether to reuse them,
+so it is safe to rerun while tuning a clip.
 
 ## Project Structure
 
