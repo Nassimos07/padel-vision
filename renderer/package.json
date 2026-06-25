@@ -1,0 +1,25 @@
+{
+  "name": "padel-vision-renderer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "remotion preview src/index.ts",
+    "render": "remotion render src/index.ts PadelVision out/padel-vision-v2.mp4",
+    "render:preview": "remotion render src/index.ts PadelVisionPreview out/padel-vision-v2-preview.mp4",
+    "render:fast": "remotion render src/index.ts PadelVision out/padel-vision-v2-fast.mp4 --frames=0-299 --concurrency=4",
+    "render:still": "remotion still src/index.ts PadelVision out/padel-vision-v2.png",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.270",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.270"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.7.3"
+  }
+}
