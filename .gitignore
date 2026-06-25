@@ -37,6 +37,9 @@ data/calibration/*
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+node_modules/
+renderer/out/
+renderer/public/render/
 
 # IDE / OS
 .vscode/
