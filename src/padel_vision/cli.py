@@ -18,11 +18,13 @@ import fire
 from padel_vision import __version__, calibration
 from padel_vision.court import CORNER_NAMES
 from padel_vision.detect import detect_players
+from padel_vision.final_render import build_detection_cache, render_final_cut
 from padel_vision.heatmap import make_heatmap
 from padel_vision.pickers import pick_points
 from padel_vision.rings import adjust_ring
 from padel_vision.track import track_players
 from padel_vision.video.io import grab_frame
+from padel_vision.workflow import guide as guided_setup
 
 
 class _Roi:
@@ -36,7 +38,8 @@ class _Roi:
             frame: frame index to display for picking (default ``300``).
         """
         pts = pick_points(
-            grab_frame(video, frame), n=None,
+            grab_frame(video, frame),
+            n=None,
             title="ROI - click the polygon outline, then 'f' to finish",
         )
         if pts is None:
@@ -51,7 +54,9 @@ class _Court:
     def adjust(self, video: str, frame: int = 300):
         """Pick the 4 court corners (TL, TR, BR, BL) and save them for this clip."""
         pts = pick_points(
-            grab_frame(video, frame), n=4, labels=CORNER_NAMES,
+            grab_frame(video, frame),
+            n=4,
+            labels=CORNER_NAMES,
             title="Court - click TL, TR, BR, BL",
         )
         if pts is None:
@@ -76,8 +81,9 @@ class _Court:
 class _Detect:
     """Detection commands."""
 
-    def players(self, video: str, frame: int = 0, conf: float = 0.5,
-                model: str = "medium", stride: int = 2):
+    def players(
+        self, video: str, frame: int = 0, conf: float = 0.5, model: str = "medium", stride: int = 2
+    ):
         """Detect players in real time, filtered by the saved ROI if there is one.
 
         Args:
@@ -140,6 +146,46 @@ class _Track:
         )
 
 
+class _Final:
+    """Notebook-style final cut commands."""
+
+    def cache(
+        self,
+        video: str,
+        output: str = None,
+        stride: int = 2,
+        model: str = "nano",
+        conf: float = 0.3,
+    ):
+        """Build the V2 notebook detection cache with RF-DETR segmentation."""
+        return build_detection_cache(
+            video,
+            output=output,
+            stride=stride,
+            model=model,
+            conf=conf,
+        )
+
+    def render(
+        self,
+        video: str,
+        cache: str = "data/processed/detect_cache.pkl",
+        bev_json: str = None,
+        court_map: str = "data/court_map.jpg",
+        output: str = "data/processed/padel_final.mp4",
+        show: bool = False,
+    ):
+        """Render the direct OpenCV final layout from the V2 notebook."""
+        return render_final_cut(
+            video,
+            cache=cache,
+            bev_json=bev_json,
+            court_map=court_map,
+            output=output,
+            show=show,
+        )
+
+
 class PadelVision:
     """padel-vision — computer-vision analytics for padel."""
 
@@ -148,12 +194,24 @@ class PadelVision:
         self.court = _Court()
         self.detect = _Detect()
         self.track = _Track()
+        self.final = _Final()
 
-    def heatmap(self, video: str, start: float = 0.0, duration: float = None,
-                stride: int = 3, conf: float = 0.5, model: str = "medium",
-                output: str = None, show: bool = True, frame: int = None,
-                foreground: bool = True, foreground_model: str = "yolo11n-seg.pt",
-                trail: bool = False, labels: bool = False):
+    def heatmap(
+        self,
+        video: str,
+        start: float = 0.0,
+        duration: float = None,
+        stride: int = 3,
+        conf: float = 0.5,
+        model: str = "medium",
+        output: str = None,
+        show: bool = True,
+        frame: int = None,
+        foreground: bool = True,
+        foreground_model: str = "yolo11n-seg.pt",
+        trail: bool = False,
+        labels: bool = False,
+    ):
         """Render one heatmap preview frame with segmentation + detections.
 
         Args:
@@ -171,10 +229,45 @@ class PadelVision:
             trail: show the same movement trail annotation used by ``track players``.
             labels: show the same P<ID> labels used by ``track players``.
         """
-        make_heatmap(video, start=start, duration=duration, stride=stride,
-                     conf=conf, model=model, output=output, show=show,
-                     frame=frame, foreground=foreground, foreground_model=foreground_model,
-                     trail=trail, labels=labels)
+        make_heatmap(
+            video,
+            start=start,
+            duration=duration,
+            stride=stride,
+            conf=conf,
+            model=model,
+            output=output,
+            show=show,
+            frame=frame,
+            foreground=foreground,
+            foreground_model=foreground_model,
+            trail=trail,
+            labels=labels,
+        )
+
+    def guide(
+        self,
+        video: str = None,
+        frame: int = 300,
+        court_map: str = "data/court_map.jpg",
+        stride: int = 2,
+        model: str = "nano",
+        conf: float = 0.3,
+    ):
+        """Interactive step-by-step setup for the notebook-style final layout.
+
+        This opens the ROI, court-corner, and bird's-eye-view pickers as needed,
+        builds the V2 notebook detection cache, then renders the direct OpenCV
+        final cut. Existing calibration files are detected and can be reused.
+        """
+        return guided_setup(
+            video=video,
+            frame=frame,
+            court_map=court_map,
+            stride=stride,
+            model=model,
+            conf=conf,
+        )
 
     def version(self):
         """Print the installed version."""
